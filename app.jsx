@@ -1517,6 +1517,11 @@ function SubmitResultsView() {
         formData.append('filename', exam.tracking_code + "_" + file.name);
         formData.append('mimeType', file.type);
         formData.append('base64', base64Data);
+        // เพิ่มข้อมูลสำหรับสร้างโฟลเดอร์ย่อย
+        formData.append('academic_year', exam.academic_year || '');
+        formData.append('term', exam.term || '');
+        formData.append('exam_type', exam.exam_type || '');
+        formData.append('department', exam.department || '');
 
         try {
           const response = await fetch(GAS_UPLOAD_URL, {
