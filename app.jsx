@@ -135,20 +135,20 @@ function Login({ onLogin }) {
                   <span class="text-sm text-gray-500">รหัสติดตาม</span>
                   <span class="font-bold text-blue-700 text-lg">${ex.tracking_code}</span>
                 </div>
-                <div class="grid grid-cols-2 gap-2 text-sm">
-                  <div><span class="text-gray-500">รหัสวิชา:</span> <span class="font-semibold">${ex.subject_code}</span></div>
-                  <div><span class="text-gray-500">ระดับชั้น:</span> <span class="font-semibold">${ex.level}</span></div>
-                  <div class="col-span-2"><span class="text-gray-500">รายวิชา:</span> <span class="font-semibold">${ex.subject_name}</span></div>
-                  <div><span class="text-gray-500">ประเภท:</span> <span class="font-semibold">${ex.exam_type}</span></div>
-                  <div><span class="text-gray-500">ปรนัย:</span> <span class="font-semibold">${ex.objective_count == 0 ? 'ไม่ใช้เครื่องตรวจ' : ex.objective_count + ' ข้อ'}</span></div>
+                <div class="grid grid-cols-2 gap-3 text-sm">
+                  <div><span class="text-gray-500">รหัสวิชา:</span> <span class="font-semibold text-gray-800">${ex.subject_code}</span></div>
+                  <div><span class="text-gray-500">ระดับชั้น:</span> <span class="font-semibold text-gray-800">${ex.level}</span></div>
+                  <div class="col-span-2"><span class="text-gray-500">ชื่อวิชา:</span> <span class="font-semibold text-gray-800">${ex.subject_name}</span></div>
+                  <div class="col-span-2"><span class="text-gray-500">ประเภทการสอบ:</span> <span class="font-semibold text-gray-800">${ex.exam_type}</span></div>
                 </div>
                 
-                <div class="mt-4 p-4 bg-white rounded-lg border-l-4 border-blue-500 shadow-sm flex flex-col items-center justify-center">
-                  <span class="text-xs text-gray-500 uppercase tracking-wider mb-1">สถานะปัจจุบัน</span>
-                  <span class="text-xl font-bold text-blue-600 text-center">${ex.status}</span>
+                <div class="mt-5 p-5 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl shadow-md flex flex-col items-center justify-center text-white">
+                  <span class="text-xs text-blue-200 uppercase tracking-wider mb-1">สถานะปัจจุบัน</span>
+                  <span class="text-2xl font-bold text-center drop-shadow-md">${ex.status}</span>
+                  <div class="mt-3 bg-white/20 px-3 py-1 rounded-full flex items-center gap-1 text-xs text-blue-50">
+                    <i class="ph ph-clock"></i> <span>เวลา: ${new Date(ex.updated_at).toLocaleString('th-TH')}</span>
+                  </div>
                 </div>
-                
-                <p class="text-xs text-gray-400 text-right mt-2"><i class="ph ph-clock"></i> อัปเดตล่าสุด: ${new Date(ex.updated_at).toLocaleString('th-TH')}</p>
               </div>
               ${pdfSection}
             `,
