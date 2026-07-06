@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>Setup Firebase Database</title>
+  <!-- Firebase v8 -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script src="firebase-config.js"></script>
+  <style>
+    body { font-family: sans-serif; padding: 40px; line-height: 1.6; }
+    button { padding: 10px 20px; font-size: 16px; cursor: pointer; background: #2563eb; color: white; border: none; border-radius: 5px; }
+  </style>
+</head>
+<body>
+  <h2>ตั้งค่าฐานข้อมูลเริ่มต้น (Database Initialization)</h2>
+  <p>คลิกปุ่มด้านล่างเพื่อสร้าง User ผู้ดูแลระบบ (Admin) ตั้งต้นลงในฐานข้อมูล Firestore</p>
+  <button id="initBtn">สร้างข้อมูลเริ่มต้น</button>
+  <div id="status" style="margin-top: 20px; font-weight: bold; color: green;"></div>
+
+  <script>
+    document.getElementById('initBtn').addEventListener('click', async () => {
+      const status = document.getElementById('status');
+      status.innerText = "กำลังสร้างข้อมูล...";
+      
+      try {
+        const usersRef = db.collection("Users");
+        const snapshot = await usersRef.get();
+        
+        if (!snapshot.empty) {
+          status.innerText = "ฐานข้อมูลมีข้อมูลอยู่แล้ว ไม่จำเป็นต้องสร้างใหม่ครับ";
+          return;
+        }
+
+        // Add default admin
+        await usersRef.add({
+          username: "admin",
+          password: "password", // รหัสผ่านเริ่มต้น
+          role: "admin",
+          name: "ผู้ดูแลระบบ",
+          department: "งานวัดผล"
+        });
+
+        // Add default settings
+        await db.collection("Settings").doc("system_settings").set({
+          academic_year: "2567",
+          term: "1"
+        });
+
+        status.innerText = "✅ สร้างผู้ดูแลระบบสำเร็จ! Username: admin / Password: password (สามารถลบไฟล์ init.html นี้ทิ้งได้เลย)";
+      } catch (err) {
+        status.innerText = "❌ เกิดข้อผิดพลาด: " + err.message + "\n\nอย่าลืมตั้งค่า Rules ของ Firestore ให้เป็น true นะครับ";
+        status.style.color = "red";
+      }
+    });
+  </script>
+</body>
+</html>

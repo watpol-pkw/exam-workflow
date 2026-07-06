@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Exam Workflow Tracking System V3.3.4</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'Kanit', 'sans-serif'] },
+          colors: { pkw: { dark: '#0f172a', navy: '#1e3a8a', blue: '#2563eb', light: '#60a5fa' } }
+        }
+      }
+    }
+  </script>
+  
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet" />
+  <link href="styles.css" rel="stylesheet" />
+  
+  <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+  
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+
+  <!-- React & Babel -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone@7.20.0/babel.min.js" crossorigin="anonymous"></script>
+
+  <!-- Firebase v8 -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+  <!-- Database & API Connection -->
+  <script src="firebase-config.js?v=3.3.0"></script>
+  <script src="api.js?v=3.3.0"></script>
+
+  <!-- React Components (Loaded with Babel) -->
+  <script type="text/babel" data-presets="react,env" src="app.jsx?v=334"></script>
+</head>
+<body class="bg-gray-100 font-sans text-gray-800 antialiased text-base">
+  
+  <div id="error-log" style="color: red; padding: 0px; font-weight: bold; font-family: monospace;"></div>
+  <script>
+    window.addEventListener('error', function(e) {
+      document.getElementById('error-log').innerText += e.message + ' at ' + e.filename + ':' + e.lineno + '\n';
+    });
+    window.addEventListener('unhandledrejection', function(e) {
+      document.getElementById('error-log').innerText += 'Unhandled Promise: ' + e.reason + '\n';
+    });
+  </script>
+
+  <div id="root"></div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
+</body>
+</html>
