@@ -451,33 +451,28 @@ function LatestStatusView({ user }) {
       "ตรวจข้อสอบเสร็จสิ้น"
     ];
 
-    let optionsHtml = '';
-    statuses.forEach(s => {
-      optionsHtml += `<option value="${s}" ${s === exam.status ? 'selected' : ''}>${s}</option>`;
-    });
+    const currentIndex = statuses.indexOf(exam.status);
+    if (currentIndex >= statuses.length - 1) {
+      Swal.fire('แจ้งเตือน', 'ข้อสอบนี้อยู่ในสถานะสิ้นสุดแล้ว', 'info');
+      return;
+    }
+    const nextStatus = statuses[currentIndex + 1];
 
     Swal.fire({
-      title: 'อัปเดตสถานะข้อสอบ',
+      title: 'ยืนยันการอัปเดตสถานะ?',
       html: `
         <div class="text-left mb-4 text-sm text-gray-700 bg-gray-50 p-3 rounded-lg">
           <p><strong>วิชา:</strong> ${exam.subject_code} ${exam.subject_name}</p>
           <p><strong>รหัสติดตาม:</strong> ${exam.tracking_code}</p>
         </div>
-        <select id="status-select" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
-          ${optionsHtml}
-        </select>
+        <p>คุณต้องการอัปเดตสถานะเป็น <strong class="text-blue-600">${nextStatus}</strong> หรือไม่?</p>
       `,
+      icon: 'question',
       showCancelButton: true,
-      confirmButtonText: 'บันทึก',
-      cancelButtonText: 'ยกเลิก',
-      preConfirm: () => {
-        return document.getElementById('status-select').value;
-      }
+      confirmButtonText: 'อัปเดต',
+      cancelButtonText: 'ยกเลิก'
     }).then((result) => {
       if (result.isConfirmed) {
-        const newStatus = result.value;
-        if (newStatus === exam.status) return;
-        
         Swal.fire({title: 'กำลังบันทึก...', allowOutsideClick: false, didOpen: () => Swal.showLoading()});
         
         google.script.run.withSuccessHandler((res) => {
@@ -492,7 +487,7 @@ function LatestStatusView({ user }) {
           } else {
             Swal.fire('ข้อผิดพลาด', res.message, 'error');
           }
-        }).updateExamStatus(exam.tracking_code, newStatus);
+        }).updateExamStatus(exam.tracking_code, nextStatus);
       }
     });
   };

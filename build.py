@@ -51,12 +51,35 @@ for file in components:
 final_code = final_code.replace('<App />', '<ErrorBoundary><App /></ErrorBoundary>')
 
 final_code += '''
-// Start Application immediately (Babel Standalone runs this asynchronously after the DOM is ready)
+// Start Application immediately
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(<ErrorBoundary><App /></ErrorBoundary>);
 '''
 
-with open('app.jsx', 'w', encoding='utf-8') as f:
-    f.write(final_code)
+# Escape backticks, dollars, and backslashes for JS template literal
+escaped_code = final_code.replace('\\', '\\\\').replace('`', '\\`').replace('$', '\\$')
 
-print('Build complete: app.jsx created with Error Boundary.')
+final_js = f"""
+(function() {{
+  const appCode = `{escaped_code}`;
+  const script = document.createElement('script');
+  script.type = 'text/babel';
+  script.setAttribute('data-presets', 'react,env');
+  script.text = appCode;
+  document.head.appendChild(script);
+  
+  // Trigger Babel if already loaded, else wait
+  if (window.Babel) {{
+    window.Babel.transformScriptTags();
+  }} else {{
+    window.addEventListener('DOMContentLoaded', () => {{
+      if (window.Babel) window.Babel.transformScriptTags();
+    }});
+  }}
+}})();
+"""
+
+with open('app.js', 'w', encoding='utf-8') as f:
+    f.write(final_js)
+
+print('Build complete: app.js created for local file:// usage.')
