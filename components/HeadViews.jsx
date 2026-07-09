@@ -438,6 +438,65 @@ function LatestStatusView({ user }) {
     }).getExams(dept);
   }, [user]);
 
+  const handleUpdateStatus = (exam) => {
+    if (user.role !== 'admin') return;
+    
+    const statuses = [
+      "ตรวจสอบความถูกต้อง",
+      "กำลังจัดพิมพ์",
+      "อัดสำเนาเสร็จสิ้น",
+      "จัดเก็บข้อสอบ",
+      "จัดสอบ",
+      "กำลังตรวจข้อสอบ",
+      "ตรวจข้อสอบเสร็จสิ้น"
+    ];
+
+    let optionsHtml = '';
+    statuses.forEach(s => {
+      optionsHtml += `<option value="${s}" ${s === exam.status ? 'selected' : ''}>${s}</option>`;
+    });
+
+    Swal.fire({
+      title: 'อัปเดตสถานะข้อสอบ',
+      html: `
+        <div class="text-left mb-4 text-sm text-gray-700 bg-gray-50 p-3 rounded-lg">
+          <p><strong>วิชา:</strong> ${exam.subject_code} ${exam.subject_name}</p>
+          <p><strong>รหัสติดตาม:</strong> ${exam.tracking_code}</p>
+        </div>
+        <select id="status-select" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+          ${optionsHtml}
+        </select>
+      `,
+      showCancelButton: true,
+      confirmButtonText: 'บันทึก',
+      cancelButtonText: 'ยกเลิก',
+      preConfirm: () => {
+        return document.getElementById('status-select').value;
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const newStatus = result.value;
+        if (newStatus === exam.status) return;
+        
+        Swal.fire({title: 'กำลังบันทึก...', allowOutsideClick: false, didOpen: () => Swal.showLoading()});
+        
+        google.script.run.withSuccessHandler((res) => {
+          if(res.success) {
+            Swal.fire('สำเร็จ', res.message, 'success');
+            // reload
+            let dept = user.role === 'head' ? user.department : "all";
+            google.script.run.withSuccessHandler((data) => {
+              const sorted = data.sort((a,b) => (a.tracking_code || '').localeCompare(b.tracking_code || '', 'th', {numeric: true}));
+              setExams(sorted);
+            }).getExams(dept);
+          } else {
+            Swal.fire('ข้อผิดพลาด', res.message, 'error');
+          }
+        }).updateExamStatus(exam.tracking_code, newStatus);
+      }
+    });
+  };
+
   const getStatusColor = (status) => {
     const colors = {
       "รอตรวจสอบ": "bg-gray-100 text-gray-800",
@@ -484,9 +543,15 @@ function LatestStatusView({ user }) {
                   <td className="px-4 py-3">{e.exam_type}</td>
                   <td className="px-4 py-3">{e.department}</td>
                   <td className="px-4 py-3">
-                    <span className={`text-xs font-medium px-2.5 py-0.5 rounded ${getStatusColor(e.status)}`}>
-                      {e.status}
-                    </span>
+                    {user.role === 'admin' ? (
+                      <button onClick={() => handleUpdateStatus(e)} className={`text-xs font-medium px-2.5 py-1 rounded shadow-sm hover:opacity-80 transition cursor-pointer flex items-center gap-1 ${getStatusColor(e.status)}`}>
+                        {e.status} <i className="ph ph-caret-down ml-1"></i>
+                      </button>
+                    ) : (
+                      <span className={`text-xs font-medium px-2.5 py-0.5 rounded ${getStatusColor(e.status)}`}>
+                        {e.status}
+                      </span>
+                    )}
                   </td>
                   <td className="px-4 py-3 text-xs">{new Date(e.updated_at).toLocaleString('th-TH')}</td>
                 </tr>

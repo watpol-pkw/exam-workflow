@@ -324,7 +324,7 @@ function Login({ onLogin }) {
           
           <div className="mt-auto pt-10 text-center">
             <p className="text-xs text-gray-400">© ระบบติดตามกระบวนการจัดสอบ (Exam Workflow Tracking System)</p>
-            <p className="text-xs text-gray-400">V3.5.0 (Firebase) งานวัดผลและประเมินผล โรงเรียนภูเก็ตวิทยาลัย</p>
+            <p className="text-xs text-gray-400">V3.5.2 (Firebase) งานวัดผลและประเมินผล โรงเรียนภูเก็ตวิทยาลัย</p>
           </div>
         </div>
         
