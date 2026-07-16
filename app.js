@@ -2676,9 +2676,7 @@ function ExamResultsView({ user }) {
                       <td className="px-3 py-2 font-medium">{e.level}</td>
                       <td className="px-3 py-2">{e.subject_code}</td>
                       <td className="px-3 py-2">{e.subject_name}</td>
-                      <td className="px-3 py-2 text-center">{renderPdfIcon(e.results?.score_url, "คะแนนสอบ")}</td>
-                      <td className="px-3 py-2 text-center">{renderPdfIcon(e.results?.summary_url, "สรุปวิเคราะห์ข้อสอบ")}</td>
-                      <td className="px-3 py-2 text-center">{renderPdfIcon(e.results?.analysis_url, "วิเคราะห์ข้อสอบรายข้อ")}</td>
+                      {renderPdfIconsOrMessage(e)}
                     </tr>
                   ))}
                   {midtermExams.length === 0 && <tr><td colSpan="6" className="text-center py-4">ยังไม่มีผลการสอบกลางภาค</td></tr>}
@@ -2708,9 +2706,7 @@ function ExamResultsView({ user }) {
                       <td className="px-3 py-2 font-medium">{e.level}</td>
                       <td className="px-3 py-2">{e.subject_code}</td>
                       <td className="px-3 py-2">{e.subject_name}</td>
-                      <td className="px-3 py-2 text-center">{renderPdfIcon(e.results?.score_url, "คะแนนสอบ")}</td>
-                      <td className="px-3 py-2 text-center">{renderPdfIcon(e.results?.summary_url, "สรุปวิเคราะห์ข้อสอบ")}</td>
-                      <td className="px-3 py-2 text-center">{renderPdfIcon(e.results?.analysis_url, "วิเคราะห์ข้อสอบรายข้อ")}</td>
+                      {renderPdfIconsOrMessage(e)}
                     </tr>
                   ))}
                   {finalExams.length === 0 && <tr><td colSpan="6" className="text-center py-4">ยังไม่มีผลการสอบปลายภาค</td></tr>}
