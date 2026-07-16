@@ -189,6 +189,7 @@ function ReceiveExamView() {
   const [receivedExams, setReceivedExams] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [showDropdown, setShowDropdown] = useState(false);
+  const [examTypeFilter, setExamTypeFilter] = useState('ทั้งหมด');
   const [formData, setFormData] = useState({
     tracking_code: '',
     subject_code: '',
@@ -439,11 +440,18 @@ function ReceiveExamView() {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block mb-2 text-sm font-medium text-gray-900">ประเภทการสอบ</label>
-              <select className="bg-white border border-gray-300 text-sm rounded-lg block w-full p-2.5" 
-                value={formData.exam_type} onChange={e=>setFormData({...formData, exam_type: e.target.value})}>
-                <option value="กลางภาค">กลางภาค</option>
-                <option value="ปลายภาค">ปลายภาค</option>
-              </select>
+              <div className="flex items-center gap-4 bg-white border border-gray-300 rounded-lg p-2.5">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input type="radio" name="exam_type" value="กลางภาค" className="w-4 h-4 text-blue-600 focus:ring-blue-500" 
+                    checked={formData.exam_type === 'กลางภาค'} onChange={e=>setFormData({...formData, exam_type: e.target.value})} />
+                  <span className="text-sm text-gray-900">กลางภาค</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input type="radio" name="exam_type" value="ปลายภาค" className="w-4 h-4 text-blue-600 focus:ring-blue-500" 
+                    checked={formData.exam_type === 'ปลายภาค'} onChange={e=>setFormData({...formData, exam_type: e.target.value})} />
+                  <span className="text-sm text-gray-900">ปลายภาค</span>
+                </label>
+              </div>
             </div>
             <div>
               <label className="block mb-2 text-sm font-medium text-gray-900">จำนวนข้อสอบตรวจด้วยเครื่องตรวจ</label>
@@ -462,11 +470,22 @@ function ReceiveExamView() {
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-bold font-kanit text-gray-800 flex items-center">
             <i className="ph ph-list-bullets text-blue-600 mr-2 text-xl"></i>
-            รายการข้อสอบที่รับแล้วในภาคเรียนนี้ ({receivedExams.length})
+            รายการข้อสอบที่รับแล้วในภาคเรียนนี้ ({receivedExams.filter(e => examTypeFilter === 'ทั้งหมด' || e.exam_type === examTypeFilter).length})
           </h3>
-          <button onClick={handleExportExcel} className="text-sm flex items-center bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded-lg transition-colors shadow-sm">
-            <i className="ph ph-file-xls mr-1.5 text-lg"></i> Download Excel
-          </button>
+          <div className="flex items-center gap-2">
+            <select 
+              className="bg-gray-50 border border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2 shadow-sm"
+              value={examTypeFilter}
+              onChange={(e) => setExamTypeFilter(e.target.value)}
+            >
+              <option value="ทั้งหมด">ทั้งหมด</option>
+              <option value="กลางภาค">กลางภาค</option>
+              <option value="ปลายภาค">ปลายภาค</option>
+            </select>
+            <button onClick={handleExportExcel} className="text-sm flex items-center bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded-lg transition-colors shadow-sm">
+              <i className="ph ph-file-xls mr-1.5 text-lg"></i> Download Excel
+            </button>
+          </div>
         </div>
         
         <div className="overflow-x-auto rounded-lg border border-gray-200">
@@ -484,7 +503,8 @@ function ReceiveExamView() {
               </tr>
             </thead>
             <tbody>
-              {receivedExams.length > 0 ? receivedExams.map((exam, i) => (
+              {receivedExams.filter(e => examTypeFilter === 'ทั้งหมด' || e.exam_type === examTypeFilter).length > 0 ? 
+               receivedExams.filter(e => examTypeFilter === 'ทั้งหมด' || e.exam_type === examTypeFilter).map((exam, i) => (
                 <tr key={exam.id || i} className="border-b hover:bg-gray-50">
                   <td className="px-4 py-3 font-semibold text-blue-600">{exam.tracking_code}</td>
                   <td className="px-4 py-3">{exam.subject_code}</td>
