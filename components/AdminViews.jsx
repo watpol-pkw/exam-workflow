@@ -260,6 +260,10 @@ function ReceiveExamView() {
             <input id="swal-tracking" class="swal2-input !m-0 !w-full !mt-1" value="${exam.tracking_code}">
           </div>
           <div>
+            <label class="block text-sm font-medium text-gray-700">รหัสวิชา</label>
+            <input id="swal-subjectcode" class="swal2-input !m-0 !w-full !mt-1" value="${exam.subject_code}">
+          </div>
+          <div>
             <label class="block text-sm font-medium text-gray-700">วันที่จัดสอบ</label>
             <input type="date" id="swal-date" class="swal2-input !m-0 !w-full !mt-1" value="${exam.exam_date}">
           </div>
@@ -282,6 +286,7 @@ function ReceiveExamView() {
       preConfirm: () => {
         return {
           tracking_code: document.getElementById('swal-tracking').value,
+          subject_code: document.getElementById('swal-subjectcode').value,
           exam_date: document.getElementById('swal-date').value,
           exam_type: document.getElementById('swal-type').value,
           objective_count: document.getElementById('swal-obj').value
@@ -519,6 +524,7 @@ function ReceiveExamView() {
 function UpdateStatusView({ mode }) {
   const [exams, setExams] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
   
   const title = mode === 'prepare' ? "เตรียมความพร้อมก่อนจัดสอบ" : "ขั้นตอนการจัดสอบ";
   const icon = mode === 'prepare' ? "ph-copy" : "ph-exam";
@@ -639,10 +645,35 @@ function UpdateStatusView({ mode }) {
         {title}
       </h2>
       
+      <div className="mb-6 max-w-md">
+        <label htmlFor="search-exam" className="mb-2 text-sm font-medium text-gray-900 sr-only">ค้นหา</label>
+        <div className="relative">
+          <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+            <i className="ph ph-magnifying-glass text-gray-400"></i>
+          </div>
+          <input 
+            type="search" 
+            id="search-exam" 
+            className="block w-full p-2.5 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500" 
+            placeholder="ค้นหารหัสติดตาม, รหัสวิชา, หรือชื่อวิชา..." 
+            value={searchTerm}
+            onChange={e => setSearchTerm(e.target.value)}
+          />
+        </div>
+      </div>
+
       {loading ? <p>กำลังโหลด...</p> : (
         <div className="space-y-8">
           {Object.entries(
-            exams.reduce((acc, e) => {
+            exams
+              .filter(e => {
+                if (!searchTerm) return true;
+                const lowerSearch = searchTerm.toLowerCase();
+                return (e.tracking_code && e.tracking_code.toLowerCase().includes(lowerSearch)) ||
+                       (e.subject_code && e.subject_code.toLowerCase().includes(lowerSearch)) ||
+                       (e.subject_name && e.subject_name.toLowerCase().includes(lowerSearch));
+              })
+              .reduce((acc, e) => {
               const date = e.exam_date || 'ไม่ระบุวันที่';
               if (!acc[date]) acc[date] = [];
               acc[date].push(e);

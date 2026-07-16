@@ -61,39 +61,7 @@ function Login({ onLogin }) {
         if (res.success) {
           const ex = res.exam;
           
-          let pdfButtons = '';
-          if (ex.results) {
-            if (ex.results.score_url) {
-              pdfButtons += `<a href="${ex.results.score_url}" target="_blank" class="flex-1 min-w-[120px] bg-red-50 hover:bg-red-100 text-red-600 font-semibold py-2 px-3 rounded-lg border border-red-200 transition-colors flex flex-col items-center justify-center gap-1">
-                <i class="ph ph-file-pdf text-2xl"></i>
-                <span class="text-xs text-center">คะแนนสอบ</span>
-              </a>`;
-            }
-            if (ex.results.summary_url) {
-              pdfButtons += `<a href="${ex.results.summary_url}" target="_blank" class="flex-1 min-w-[120px] bg-red-50 hover:bg-red-100 text-red-600 font-semibold py-2 px-3 rounded-lg border border-red-200 transition-colors flex flex-col items-center justify-center gap-1">
-                <i class="ph ph-chart-pie-slice text-2xl"></i>
-                <span class="text-xs text-center">สรุปวิเคราะห์</span>
-              </a>`;
-            }
-            if (ex.results.analysis_url) {
-              pdfButtons += `<a href="${ex.results.analysis_url}" target="_blank" class="flex-1 min-w-[120px] bg-red-50 hover:bg-red-100 text-red-600 font-semibold py-2 px-3 rounded-lg border border-red-200 transition-colors flex flex-col items-center justify-center gap-1">
-                <i class="ph ph-list-numbers text-2xl"></i>
-                <span class="text-xs text-center">วิเคราะห์รายข้อ</span>
-              </a>`;
-            }
-          }
-
-          let pdfSection = '';
-          if (pdfButtons !== '') {
-            pdfSection = `
-              <div class="mt-5 border-t border-gray-100 pt-4">
-                <p class="text-sm font-semibold text-gray-700 mb-3 text-left"><i class="ph ph-download-simple mr-1"></i> ดาวน์โหลดไฟล์ผลการสอบ:</p>
-                <div class="flex flex-wrap gap-2 justify-center">
-                  ${pdfButtons}
-                </div>
-              </div>
-            `;
-          }
+          // Remove PDF section
 
           Swal.fire({
             title: `<div class="flex items-center justify-center gap-2 text-blue-800"><i class="ph ph-magnifying-glass text-3xl"></i> ข้อมูลข้อสอบ</div>`,
@@ -118,7 +86,7 @@ function Login({ onLogin }) {
                   </div>
                 </div>
               </div>
-              ${pdfSection}
+
             `,
             width: '32em',
             confirmButtonColor: '#2563eb',
@@ -324,7 +292,7 @@ function Login({ onLogin }) {
           
           <div className="mt-auto pt-10 text-center">
             <p className="text-xs text-gray-400">© ระบบติดตามกระบวนการจัดสอบ (Exam Workflow Tracking System)</p>
-            <p className="text-xs text-gray-400">V3.5.2 (Firebase) งานวัดผลและประเมินผล โรงเรียนภูเก็ตวิทยาลัย</p>
+            <p className="text-xs text-gray-400">V3.6.0 (Firebase) งานวัดผลและประเมินผล โรงเรียนภูเก็ตวิทยาลัย</p>
           </div>
         </div>
         

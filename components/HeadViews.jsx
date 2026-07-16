@@ -426,6 +426,7 @@ function RequestExamView({ user }) {
 function LatestStatusView({ user }) {
   const [exams, setExams] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [statusFilter, setStatusFilter] = useState("all");
 
   useEffect(() => {
     let dept = "all";
@@ -443,7 +444,7 @@ function LatestStatusView({ user }) {
     
     const statuses = [
       "ตรวจสอบความถูกต้อง",
-      "กำลังจัดพิมพ์",
+      "กำลังอัดสำเนา",
       "อัดสำเนาเสร็จสิ้น",
       "จัดเก็บข้อสอบ",
       "จัดสอบ",
@@ -506,12 +507,34 @@ function LatestStatusView({ user }) {
     return colors[status] || "bg-gray-100 text-gray-800";
   };
 
+  const filteredExams = statusFilter === "all" ? exams : exams.filter(e => e.status === statusFilter);
+
   return (
     <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 fade-in">
-      <h2 className="text-2xl font-bold font-kanit mb-6 text-gray-800 flex items-center">
-        <i className="ph ph-activity text-blue-600 mr-2 text-3xl"></i>
-        สถานะล่าสุด
-      </h2>
+      <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
+        <h2 className="text-2xl font-bold font-kanit text-gray-800 flex items-center">
+          <i className="ph ph-activity text-blue-600 mr-2 text-3xl"></i>
+          สถานะล่าสุด
+        </h2>
+        <div className="flex items-center gap-2">
+          <label className="text-sm font-medium text-gray-700">กรองสถานะ:</label>
+          <select 
+            className="bg-gray-50 border border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2 shadow-sm"
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+          >
+            <option value="all">ดูทุกสถานะ</option>
+            <option value="รอตรวจสอบ">รอตรวจสอบ</option>
+            <option value="ตรวจสอบความถูกต้อง">ตรวจสอบความถูกต้อง</option>
+            <option value="กำลังอัดสำเนา">กำลังอัดสำเนา</option>
+            <option value="อัดสำเนาเสร็จสิ้น">อัดสำเนาเสร็จสิ้น</option>
+            <option value="จัดเก็บข้อสอบ">จัดเก็บข้อสอบ</option>
+            <option value="จัดสอบ">จัดสอบ</option>
+            <option value="กำลังตรวจข้อสอบ">กำลังตรวจข้อสอบ</option>
+            <option value="ตรวจข้อสอบเสร็จสิ้น">ตรวจข้อสอบเสร็จสิ้น</option>
+          </select>
+        </div>
+      </div>
       
       {loading ? <p>กำลังโหลด...</p> : (
         <div className="overflow-x-auto">
@@ -529,7 +552,7 @@ function LatestStatusView({ user }) {
               </tr>
             </thead>
             <tbody>
-              {exams.map((e, i) => (
+              {filteredExams.map((e, i) => (
                 <tr key={i} className="border-b hover:bg-gray-50">
                   <td className="px-4 py-3 font-medium text-gray-900">{e.tracking_code}</td>
                   <td className="px-4 py-3">{e.subject_code}</td>
@@ -551,7 +574,7 @@ function LatestStatusView({ user }) {
                   <td className="px-4 py-3 text-xs">{new Date(e.updated_at).toLocaleString('th-TH')}</td>
                 </tr>
               ))}
-              {exams.length === 0 && <tr><td colSpan="8" className="text-center py-4">ไม่มีข้อมูลการติดตาม</td></tr>}
+              {filteredExams.length === 0 && <tr><td colSpan="8" className="text-center py-4">ไม่มีข้อมูลการติดตาม</td></tr>}
             </tbody>
           </table>
         </div>
@@ -784,11 +807,9 @@ function ExamResultsView({ user }) {
     const [year, term] = selectedTermKey.split('-');
     
     google.script.run.withSuccessHandler((data) => {
-      // กรองเฉพาะวิชาที่มีผลการสอบ (มี properties results)
-      const examsWithResults = data.filter(e => e.results && (e.results.score_url || e.results.summary_url || e.results.analysis_url));
-      
+      // แสดงวิชาทั้งหมด
       // เรียงลำดับตามระดับชั้น และรหัสวิชา
-      const sorted = examsWithResults.sort((a,b) => {
+      const sorted = data.sort((a,b) => {
         if (a.level !== b.level) {
           return (a.level || '').localeCompare(b.level || '', 'th', {numeric: true});
         }
@@ -799,12 +820,26 @@ function ExamResultsView({ user }) {
     }).getExams(dept, year, term);
   }, [user, selectedTermKey]);
 
-  const renderPdfIcon = (url, label) => {
-    if (!url) return <span className="text-gray-300">-</span>;
+  const renderPdfIconsOrMessage = (e) => {
+    if (e.objective_count == 0 || e.objective_count === "0") {
+      return <td colSpan="3" className="px-4 py-3 text-center text-gray-500 italic">ไม่ใช้เครื่องตรวจข้อสอบ</td>;
+    }
+
+    const renderIcon = (url, label) => {
+      if (!url) return <span className="text-gray-300">-</span>;
+      return (
+        <a href={url} target="_blank" rel="noreferrer" title={label} className="inline-flex items-center justify-center text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 p-2 rounded-lg transition-colors">
+          <i className="ph ph-file-pdf text-xl"></i>
+        </a>
+      );
+    };
+
     return (
-      <a href={url} target="_blank" rel="noreferrer" title={label} className="inline-flex items-center justify-center text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 p-2 rounded-lg transition-colors">
-        <i className="ph ph-file-pdf text-xl"></i>
-      </a>
+      <>
+        <td className="px-4 py-3 text-center">{renderIcon(e.results?.score_url, 'คะแนนสอบ')}</td>
+        <td className="px-4 py-3 text-center">{renderIcon(e.results?.summary_url, 'สรุปวิเคราะห์')}</td>
+        <td className="px-4 py-3 text-center">{renderIcon(e.results?.analysis_url, 'วิเคราะห์รายข้อ')}</td>
+      </>
     );
   };
 
